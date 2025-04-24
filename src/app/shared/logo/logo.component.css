@@ -1,0 +1,6 @@
+.gradient-title {
+  color: transparent;
+  background: linear-gradient(to right, #DE4BCD, #B82525);
+  background-clip: text;
+  font-weight: bold;
+}
