@@ -1,7 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 * {
   font-family: 'Quicksand', sans-serif;
+  color: #1b1b1b;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: #f6f6f6;
 }

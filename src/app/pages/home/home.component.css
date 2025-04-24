@@ -1,0 +1,20 @@
+.gradient-title {
+  color: transparent;
+  background: linear-gradient(to right, #DE4BCD, #B82525);
+  background-clip: text;
+  font-weight: bold;
+}
+
+.link {
+  text-decoration: none;
+  color: #1B1B1B;
+}
+
+.link:hover {
+  transform: scale(1.1);
+}
+
+.link-icon {
+  font-size: 4.5rem;
+  text-decoration: none;
+}
