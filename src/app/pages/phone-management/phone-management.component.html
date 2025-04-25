@@ -76,7 +76,7 @@
                   class="btn btn-outline-primary mx-1"
                   [class.active]="$index === (phonePaginatorResponse$ | async)?.current_page"
                   [innerHTML]="page.label"
-                  [href]="page.url"
+                  (click)="changePage(page, $index)"
                 >
                </a>
               }

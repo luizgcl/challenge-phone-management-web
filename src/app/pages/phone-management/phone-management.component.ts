@@ -1,3 +1,4 @@
+import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {
@@ -9,6 +10,7 @@ import {
   shareReplay,
   switchMap,
 } from 'rxjs';
+import { Link } from '../../models/paginator';
 import { PhoneService } from '../../services/phone.service';
 import { SharedModule } from '../../shared/shared.module';
 
@@ -16,21 +18,25 @@ import { SharedModule } from '../../shared/shared.module';
   selector: 'app-phone-management',
   standalone: true,
   imports: [RouterModule, SharedModule],
+  providers: [AsyncPipe],
   templateUrl: './phone-management.component.html',
   styleUrl: './phone-management.component.css',
 })
 export class PhoneManagementComponent {
   phoneService = inject(PhoneService);
+  asyncPipe = inject(AsyncPipe);
 
   private searchTerm$ = new BehaviorSubject<string>('');
+  private url$ = new BehaviorSubject<string>('');
   private page$ = new BehaviorSubject<number>(1);
 
   phonePaginatorResponse$ = combineLatest([
     this.searchTerm$.pipe(debounceTime(300), distinctUntilChanged()),
-    this.page$,
+    this.page$.pipe(distinctUntilChanged()),
+    this.url$.pipe(distinctUntilChanged()),
   ]).pipe(
-    switchMap(([search, page]) =>
-      this.phoneService.getPhones({ search, page, perPage: 10 })
+    switchMap(([search, page, url]) =>
+      this.phoneService.getPhones({ search, page, perPage: 10 }, url)
     ),
     shareReplay(1)
   );
@@ -39,9 +45,19 @@ export class PhoneManagementComponent {
 
   setSearchTerm(term: string) {
     this.searchTerm$.next(term);
+    this.url$.next('');
+    this.page$.next(1);
   }
 
-  setPage(page: number) {
-    this.page$.next(page);
+  changePage(page: Link, index: number) {
+    if (!page.url || page.url == this.url$.value) return;
+
+    const pageIndex =
+      this.asyncPipe
+        .transform(this.phonePaginatorResponse$)
+        ?.links.findIndex((link) => link.url == page.url) ?? 1;
+
+    this.page$.next(pageIndex);
+    this.url$.next(page.url);
   }
 }

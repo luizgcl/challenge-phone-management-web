@@ -1,3 +1,5 @@
+import { environment } from '../../environments/environment';
+
 export function generateQueryString(params: Record<any, any>): string {
   let queryString = '';
 
@@ -14,4 +16,8 @@ export function generateQueryString(params: Record<any, any>): string {
   }
 
   return queryString;
+}
+
+export function replaceUrl(url: string) {
+  return url.replace(environment.apiUrl, '');
 }

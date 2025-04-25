@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { DefaultResponse } from '../models/default-response';
 import { Paginator } from '../models/paginator';
 import { PhoneNumber } from '../models/phone-number';
-import { generateQueryString } from '../shared/utils';
+import { generateQueryString, replaceUrl } from '../shared/utils';
 
 export interface FilterParams {
   search?: string;
@@ -22,17 +22,24 @@ export class PhoneService {
   httpClient = inject(HttpClient);
 
   getPhones(
-    params?: FilterParams & PaginatorParams
+    params?: FilterParams & PaginatorParams,
+    url?: string
   ): Observable<Paginator<PhoneNumber>> {
+    let finalUrl = url ? replaceUrl(url) : '/phone-numbers';
+
     if (params) {
       const query = generateQueryString(params);
 
-      return this.httpClient.get<Paginator<PhoneNumber>>(
-        `/phone-numbers?${query}`
-      );
+      if (url) {
+        finalUrl += `&${query}`;
+      } else {
+        finalUrl += `?${query}`;
+      }
+
+      return this.httpClient.get<Paginator<PhoneNumber>>(`${finalUrl}`);
     }
 
-    return this.httpClient.get<Paginator<PhoneNumber>>('/phone-numbers');
+    return this.httpClient.get<Paginator<PhoneNumber>>(`${finalUrl}`);
   }
 
   createPhone(phoneNumber: PhoneNumber): Observable<DefaultResponse> {
