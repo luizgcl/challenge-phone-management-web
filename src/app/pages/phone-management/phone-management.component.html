@@ -45,8 +45,8 @@
         @for(phoneNumber of (phones$ | async); track $index) {
           <tr>
             <td data-title="Número de Telefone">{{ phoneNumber.value }}</td>
-            <td data-title="Preço Mensal">{{ phoneNumber.monthlyPrice }}</td>
-            <td data-title="Preço de Configuração">{{ phoneNumber.setupPrice }}</td>
+            <td data-title="Preço Mensal">{{ phoneNumber.monthlyPrice | currency: phoneNumber.currency }}</td>
+            <td data-title="Preço de Configuração">{{ phoneNumber.setupPrice | currency: phoneNumber.currency }}</td>
             <td data-title="Moeda">{{ phoneNumber.currency }}</td>
             <td data-title="Ações">
               <div class="d-flex gap-2">
