@@ -1,1 +1,88 @@
-<p>phone-management works!</p>
+<nav class="bg-white nav shadow-sm p-2 mb-4 d-flex align-items-center">
+  <a class="text-decoration-none" routerLink="/">
+    <h1 class="fs-3">
+      <app-logo variant="black" />
+    </h1>
+  </a>
+  <div class="vr mx-2"></div>
+  <h2 class="fs-4">Números Disponíveis</h2>
+</nav>
+<section class="container">
+  <div class="d-flex justify-content-end">
+    <button class="btn btn-primary">
+      <i class="bi bi-plus-circle text-white"></i>
+      Adicionar Número de Telefone
+    </button>
+  </div>
+  <div class="d-flex justify-content-between align-items-center p-3">
+    <div class="input-group">
+      <span class="input-group-text">
+        <i class="bi bi-search"></i>
+      </span>
+      <input
+        #search
+        type="search"
+        class="form-control"
+        placeholder="Pesquisar por Números..."
+        aria-label="Pesquisar Números de Telefone"
+        (input)="setSearchTerm(search.value)"
+        />
+    </div>
+  </div>
+  <div class="card table-responsive-md mx-auto">
+    <caption>Lista de Números de Telefone</caption>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Número de Telefone</th>
+          <th>Preço Mensal</th>
+          <th>Preço de Configuração</th>
+          <th>Moeda</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(phoneNumber of (phones$ | async); track $index) {
+          <tr>
+            <td data-title="Número de Telefone">{{ phoneNumber.value }}</td>
+            <td data-title="Preço Mensal">{{ phoneNumber.monthlyPrice }}</td>
+            <td data-title="Preço de Configuração">{{ phoneNumber.setupPrice }}</td>
+            <td data-title="Moeda">{{ phoneNumber.currency }}</td>
+            <td data-title="Ações">
+              <div class="d-flex gap-2">
+                <a>
+                  <i class="bi bi-pencil-fill text-warning"></i>
+                </a>
+                <a>
+                  <i class="bi bi-trash-fill text-danger"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="text-center">
+              <p class="text-muted">Nenhum número de telefone encontrado.</p>
+            </td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="5">
+            <div class="d-flex justify-content-center">
+              @for(page of (phonePaginatorResponse$ | async)?.links; track $index) {
+                <a
+                  class="btn btn-outline-primary mx-1"
+                  [class.active]="$index === (phonePaginatorResponse$ | async)?.current_page"
+                  [innerHTML]="page.label"
+                  [href]="page.url"
+                >
+               </a>
+              }
+            </div>
+          </td>
+      </tfoot>
+    </table>
+  </div>
+</section>

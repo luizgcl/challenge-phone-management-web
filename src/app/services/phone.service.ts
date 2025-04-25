@@ -4,15 +4,34 @@ import { Observable } from 'rxjs';
 import { DefaultResponse } from '../models/default-response';
 import { Paginator } from '../models/paginator';
 import { PhoneNumber } from '../models/phone-number';
+import { generateQueryString } from '../shared/utils';
+
+export interface FilterParams {
+  search?: string;
+}
+
+export interface PaginatorParams {
+  page?: number;
+  perPage?: number;
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PhoneService {
-
   httpClient = inject(HttpClient);
 
-  getPhones(): Observable<Paginator<PhoneNumber>> {
+  getPhones(
+    params?: FilterParams & PaginatorParams
+  ): Observable<Paginator<PhoneNumber>> {
+    if (params) {
+      const query = generateQueryString(params);
+
+      return this.httpClient.get<Paginator<PhoneNumber>>(
+        `/phone-numbers?${query}`
+      );
+    }
+
     return this.httpClient.get<Paginator<PhoneNumber>>('/phone-numbers');
   }
 
@@ -24,8 +43,14 @@ export class PhoneService {
     return this.httpClient.get<PhoneNumber>(`/phone-numbers/${phoneId}`);
   }
 
-  updatePhone(phoneId: number, phoneNumber: Partial<PhoneNumber>): Observable<DefaultResponse> {
-    return this.httpClient.put<DefaultResponse>(`/phone-numbers/${phoneId}`, phoneNumber);
+  updatePhone(
+    phoneId: number,
+    phoneNumber: Partial<PhoneNumber>
+  ): Observable<DefaultResponse> {
+    return this.httpClient.put<DefaultResponse>(
+      `/phone-numbers/${phoneId}`,
+      phoneNumber
+    );
   }
 
   deletePhone(phoneId: number): Observable<DefaultResponse> {
