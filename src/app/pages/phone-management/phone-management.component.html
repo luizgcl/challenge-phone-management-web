@@ -9,9 +9,12 @@
 </nav>
 <section class="container">
   @if (info) {
-    <div class="alert alert-success" role="alert">
+    <div class="alert"
+      [class.alert-success]="info.action === 'create'"
+      [class.alert-warning]="info.action === 'edit'"
+       role="alert">
       <i class="bi bi-check2-circle"></i>
-      {{ info }}
+      {{ info.message }}
     </div>
   }
   <div class="d-flex justify-content-end">
@@ -56,7 +59,7 @@
             <td data-title="Moeda">{{ phoneNumber.currency }}</td>
             <td data-title="Ações">
               <div class="d-flex gap-2">
-                <a>
+                <a [routerLink]="['/editar-numero', phoneNumber.id]">
                   <i class="bi bi-pencil-fill text-warning"></i>
                 </a>
                 <a>

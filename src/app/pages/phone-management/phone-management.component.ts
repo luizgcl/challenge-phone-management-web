@@ -14,6 +14,11 @@ import { Link } from '../../models/paginator';
 import { PhoneService } from '../../services/phone.service';
 import { SharedModule } from '../../shared/shared.module';
 
+export interface InfoMessage {
+  action: 'edit' | 'create';
+  message: string;
+}
+
 @Component({
   selector: 'app-phone-management',
   standalone: true,
@@ -27,7 +32,8 @@ export class PhoneManagementComponent {
   asyncPipe = inject(AsyncPipe);
   router = inject(Router);
 
-  info = this.router.getCurrentNavigation()?.extras.info;
+  info: InfoMessage | null = this.router.getCurrentNavigation()?.extras
+    .info as InfoMessage | null;
 
   private searchTerm$ = new BehaviorSubject<string>('');
   private url$ = new BehaviorSubject<string>('');

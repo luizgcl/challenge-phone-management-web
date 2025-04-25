@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { NonNullableFormBuilder, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { PhoneService } from '../../services/phone.service';
 import { SharedModule } from '../../shared/shared.module';
 
@@ -12,10 +12,13 @@ import { SharedModule } from '../../shared/shared.module';
   templateUrl: './phone-form.component.html',
   styleUrl: './phone-form.component.css',
 })
-export class PhoneFormComponent {
+export class PhoneFormComponent implements OnInit {
   formBuilder = inject(NonNullableFormBuilder);
   phoneService = inject(PhoneService);
   router = inject(Router);
+  route = inject(ActivatedRoute);
+
+  phoneId: number | null = null;
 
   errorMessage: string | null = null;
 
@@ -34,6 +37,31 @@ export class PhoneFormComponent {
     currency: ['BRL', Validators.required],
   });
 
+  ngOnInit(): void {
+    this.route.params.subscribe((params) => {
+      if (params.hasOwnProperty('id')) {
+        this.phoneService.getPhone(params['id']).subscribe({
+          next: (phone) => {
+            this.phoneId = phone.id;
+            this.phoneForm.patchValue({
+              value: phone.value,
+              monthlyPrice: phone.monthlyPrice,
+              setupPrice: phone.setupPrice,
+              currency: phone.currency,
+            });
+          },
+          error: (err) => {
+            if (err instanceof HttpErrorResponse) {
+              this.errorMessage = err.error.message;
+            } else {
+              this.errorMessage = 'Ocorreu um erro ao buscar número!';
+            }
+          },
+        });
+      }
+    });
+  }
+
   onSubmit() {
     if (this.phoneForm.invalid) {
       return;
@@ -46,10 +74,36 @@ export class PhoneFormComponent {
       currency: this.phoneForm.value.currency!,
     };
 
+    if (this.phoneId) {
+      this.phoneService.updatePhone(this.phoneId, payload).subscribe({
+        next: () => {
+          this.router.navigate(['numeros-disponiveis'], {
+            info: {
+              action: 'edit',
+              message: `Número ${payload.value} editado com sucesso`,
+            },
+          });
+          this.phoneForm.reset();
+        },
+        error: (err) => {
+          if (err instanceof HttpErrorResponse) {
+            this.errorMessage = err.error.message;
+          } else {
+            this.errorMessage = 'Ocorreu um erro ao editar número!';
+          }
+        },
+      });
+
+      return;
+    }
+
     this.phoneService.createPhone(payload).subscribe({
       next: () => {
         this.router.navigate(['numeros-disponiveis'], {
-          info: `Número ${payload.value} criado com sucesso`,
+          info: {
+            action: 'create',
+            message: `Número ${payload.value} criado com sucesso`,
+          },
         });
         this.phoneForm.reset();
       },
