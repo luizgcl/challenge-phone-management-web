@@ -1,3 +1,4 @@
 export const environment = {
-  apiUrl: 'http://localhost:8000/api/v1',
+  apiUrl:
+    'https://challenge-phone-management-api-main-hofp03.laravel.cloud/api/v1',
 };
