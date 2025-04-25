@@ -1,4 +1,5 @@
 import { AsyncPipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import {
@@ -11,11 +12,12 @@ import {
   switchMap,
 } from 'rxjs';
 import { Link } from '../../models/paginator';
+import { PhoneNumber } from '../../models/phone-number';
 import { PhoneService } from '../../services/phone.service';
 import { SharedModule } from '../../shared/shared.module';
 
 export interface InfoMessage {
-  action: 'edit' | 'create';
+  action: 'edit' | 'create' | 'delete' | 'error';
   message: string;
 }
 
@@ -38,11 +40,13 @@ export class PhoneManagementComponent {
   private searchTerm$ = new BehaviorSubject<string>('');
   private url$ = new BehaviorSubject<string>('');
   private page$ = new BehaviorSubject<number>(1);
+  private refresh$ = new BehaviorSubject<number>(Date.now());
 
   phonePaginatorResponse$ = combineLatest([
     this.searchTerm$.pipe(debounceTime(300), distinctUntilChanged()),
     this.page$.pipe(distinctUntilChanged()),
     this.url$.pipe(distinctUntilChanged()),
+    this.refresh$.pipe(distinctUntilChanged()),
   ]).pipe(
     switchMap(([search, page, url]) =>
       this.phoneService.getPhones({ search, page, perPage: 10 }, url)
@@ -68,5 +72,30 @@ export class PhoneManagementComponent {
 
     this.page$.next(pageIndex);
     this.url$.next(page.url);
+  }
+
+  deletePhone(phone: PhoneNumber) {
+    this.phoneService.deletePhone(phone.id).subscribe({
+      next: () => {
+        this.refresh$.next(Date.now());
+        this.info = {
+          action: 'delete',
+          message: `Número ${phone.value} de telefone deletado com sucesso.`,
+        };
+      },
+      error: (err) => {
+        if (err instanceof HttpErrorResponse) {
+          this.info = {
+            action: 'error',
+            message: err.error.message,
+          };
+        } else {
+          this.info = {
+            action: 'error',
+            message: 'Erro ao deletar número de telefone.',
+          };
+        }
+      },
+    });
   }
 }

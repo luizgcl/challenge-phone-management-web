@@ -12,6 +12,8 @@
     <div class="alert"
       [class.alert-success]="info.action === 'create'"
       [class.alert-warning]="info.action === 'edit'"
+      [class.alert-danger]="info.action === 'error'"
+      [class.alert-danger]="info.action === 'delete'"
        role="alert">
       <i class="bi bi-check2-circle"></i>
       {{ info.message }}
@@ -62,7 +64,7 @@
                 <a [routerLink]="['/editar-numero', phoneNumber.id]">
                   <i class="bi bi-pencil-fill text-warning"></i>
                 </a>
-                <a>
+                <a href="javascript:void(0)" (click)="deletePhone(phoneNumber)">
                   <i class="bi bi-trash-fill text-danger"></i>
                 </a>
               </div>
