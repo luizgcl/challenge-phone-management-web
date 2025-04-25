@@ -42,7 +42,9 @@ export class PhoneService {
     return this.httpClient.get<Paginator<PhoneNumber>>(`${finalUrl}`);
   }
 
-  createPhone(phoneNumber: PhoneNumber): Observable<DefaultResponse> {
+  createPhone(
+    phoneNumber: Omit<PhoneNumber, 'id'>
+  ): Observable<DefaultResponse> {
     return this.httpClient.post<DefaultResponse>('/phone-numbers', phoneNumber);
   }
 

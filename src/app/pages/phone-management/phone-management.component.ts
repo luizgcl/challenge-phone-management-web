@@ -1,6 +1,6 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import {
   BehaviorSubject,
   combineLatest,
@@ -25,6 +25,9 @@ import { SharedModule } from '../../shared/shared.module';
 export class PhoneManagementComponent {
   phoneService = inject(PhoneService);
   asyncPipe = inject(AsyncPipe);
+  router = inject(Router);
+
+  info = this.router.getCurrentNavigation()?.extras.info;
 
   private searchTerm$ = new BehaviorSubject<string>('');
   private url$ = new BehaviorSubject<string>('');
